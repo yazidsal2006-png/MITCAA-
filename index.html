@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Golden Flower Gift for Mitca</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #050505;
+      color: #ffffff;
+      font-family: 'Georgia', serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow-x: hidden;
+      padding: 20px 10px;
+    }
+
+    /* Contenedor de la lluvia de soles arriba */
+    .sun-rain-container {
+      width: 100%;
+      max-width: 400px;
+      height: 220px;
+      position: relative;
+      pointer-events: none;
+    }
+
+    .sun-particle {
+      position: absolute;
+      border-radius: 50%;
+      animation: floatSun ease-in-out infinite alternate;
+    }
+
+    @keyframes floatSun {
+      0% {
+        transform: translateY(0) scale(0.9);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-12px) scale(1.1);
+        opacity: 1;
+      }
+    }
+
+    /* Contenedor principal de la flor */
+    .flower-container {
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      margin-top: -30px;
+    }
+
+    .golden-flower-svg {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    /* Resplandor y animación mágica de la flor */
+    .magic-flower {
+      animation: magicGlow 3.5s ease-in-out infinite alternate;
+      transform-origin: 250px 220px;
+    }
+
+    @keyframes magicGlow {
+      0% {
+        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8)) 
+                drop-shadow(0 0 25px rgba(255, 183, 3, 0.5));
+      }
+      100% {
+        filter: drop-shadow(0 0 22px rgba(255, 240, 160, 1)) 
+                drop-shadow(0 0 45px rgba(251, 133, 0, 0.85))
+                drop-shadow(0 0 65px rgba(224, 170, 255, 0.4));
+      }
+    }
+
+    /* Texto inferior intacto */
+    .footer-text {
+      text-align: center;
+      font-style: italic;
+      font-size: 1.25rem;
+      line-height: 1.6;
+      color: #f0f0f0;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.6),
+                   0 0 20px rgba(255, 215, 0, 0.4);
+      margin-top: -60px;
+      margin-bottom: 20px;
+      z-index: 10;
+    }
+
+    .heart-icon {
+      display: inline-block;
+      color: #ffffff;
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Lluvia de soles (amarillo, blanco, morado) intacta -->
+  <div class="sun-rain-container" id="sunContainer"></div>
+
+  <!-- Flor Principal de Enredados de Alta Calidad -->
+  <div class="flower-container">
+    <svg viewBox="0 0 500 750" class="golden-flower-svg">
+      <defs>
+        <!-- Filtro de resplandor para los pétalos y centro -->
+        <radialGradient id="petalGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#FFFFFF" />
+          <stop offset="25%" stop-color="#FFF3a1" />
+          <stop offset="65%" stop-color="#FFB703" />
+          <stop offset="100%" stop-color="#FB8500" />
+        </radialGradient>
+
+        <radialGradient id="centerGlow" cx="50%" cy="50%" r="40%">
+          <stop offset="0%" stop-color="#FFFFFF" />
+          <stop offset="45%" stop-color="#F72585" />
+          <stop offset="85%" stop-color="#7209B7" />
+          <stop offset="100%" stop-color="#3A0CA3" />
+        </radialGradient>
+
+        <linearGradient id="stemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#0B2B18" />
+          <stop offset="50%" stop-color="#1B4332" />
+          <stop offset="100%" stop-color="#2D6A4F" />
+        </linearGradient>
+
+        <linearGradient id="leafGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#52B788" />
+          <stop offset="50%" stop-color="#2D6A4F" />
+          <stop offset="100%" stop-color="#081C15" />
+        </linearGradient>
+      </defs>
+
+      <!-- Base Vegetal Orgánica (Hojas Realistas) -->
+      <g class="leaf-base">
+        <path d="M 250 720 C 170 710, 90 650, 40 600 C 100 590, 190 640, 250 720 Z" fill="url(#leafGrad)" />
+        <path d="M 250 720 C 330 710, 410 650, 460 600 C 400 590, 310 640, 250 720 Z" fill="url(#leafGrad)" />
+        <path d="M 250 720 C 140 680, 70 560, 90 500 C 150 530, 210 620, 250 720 Z" fill="url(#leafGrad)" opacity="0.95" />
+        <path d="M 250 720 C 360 680, 430 560, 410 500 C 350 530, 290 620, 250 720 Z" fill="url(#leafGrad)" opacity="0.95" />
+        <path d="M 250 720 C 180 640, 140 520, 170 450 C 210 490, 230 580, 250 720 Z" fill="url(#leafGrad)" opacity="0.85" />
+        <path d="M 250 720 C 320 640, 360 520, 330 450 C 290 490, 270 580, 250 720 Z" fill="url(#leafGrad)" opacity="0.85" />
+      </g>
+
+      <!-- Tallo Curvado Orgánico con Grosor Realista -->
+      <path d="M 250 720 Q 230 520 255 380 T 250 220" fill="none" stroke="url(#stemGrad)" stroke-width="10" stroke-linecap="round" />
+
+      <!-- Hojas a lo largo del tallo -->
+      <path d="M 248 480 Q 180 450 160 410 Q 210 420 250 460 Z" fill="url(#leafGrad)" />
+      <path d="M 253 380 Q 320 350 340 310 Q 290 320 251 360 Z" fill="url(#leafGrad)" />
+
+      <!-- Flor Dorada Mágica de Enredados -->
+      <g class="magic-flower">
+        <!-- Pétalos Traseros -->
+        <path d="M 250 220 C 180 170, 110 160, 90 190 C 120 220, 190 230, 250 220 Z" fill="url(#petalGrad)" />
+        <path d="M 250 220 C 320 170, 390 160, 410 190 C 380 220, 310 230, 250 220 Z" fill="url(#petalGrad)" />
+        <path d="M 250 220 C 170 120, 180 40, 220 30 C 240 80, 245 150, 250 220 Z" fill="url(#petalGrad)" />
+        <path d="M 250 220 C 330 120, 320 40, 280 30 C 260 80, 255 150, 250 220 Z" fill="url(#petalGrad)" />
+
+        <!-- Pétalos Principales Estilo Azucena / Lirio Dorado -->
+        <path d="M 250 220 Q 140 160 120 90 Q 200 130 250 220 Z" fill="url(#petalGrad)" />
+        <path d="M 250 220 Q 360 160 380 90 Q 300 130 250 220 Z" fill="url(#petalGrad)" />
+        <path d="M 250 220 Q 250 80 250 50 Q 270 130 250 220 Z" fill="url(#petalGrad)" />
+
+        <!-- Centro Mágico Místico -->
+        <circle cx="250" cy="205" r="22" fill="url(#centerGlow)" />
+
+        <!-- Pistilos Curvos con Puntas Brillantes -->
+        <path d="M 250 205 Q 220 140 195 90 Q 205 85 215 95" fill="none" stroke="#FFF8D6" stroke-width="3" stroke-linecap="round" />
+        <path d="M 250 205 Q 280 140 305 90 Q 295 85 285 95" fill="none" stroke="#FFF8D6" stroke-width="3" stroke-linecap="round" />
+        <path d="M 250 205 Q 250 120 250 70" fill="none" stroke="#FFE45E" stroke-width="3.5" stroke-linecap="round" />
+        
+        <circle cx="250" cy="65" r="6" fill="#FFFFFF" filter="drop-shadow(0 0 6px #FFF)" />
+        <circle cx="195" cy="85" r="5" fill="#FFFFFF" filter="drop-shadow(0 0 6px #FFF)" />
+        <circle cx="305" cy="85" r="5" fill="#FFFFFF" filter="drop-shadow(0 0 6px #FFF)" />
+      </g>
+    </svg>
+  </div>
+
+  <!-- Texto Inferior Dedicado Manteniendo el Formato -->
+  <div class="footer-text">
+    Con cariño de Yazid, ¿para quién más? Si solo para ti, Mitca. <span class="heart-icon">♥</span>
+  </div>
+
+  <script>
+    // Generación dinámica de la lluvia de soles arriba (Amarillo, Blanco, Morado)
+    const container = document.getElementById('sunContainer');
+    const colors = ['#FFD700', '#FFFFFF', '#D8B4FE', '#FFEA79'];
+    const totalSuns = 22;
+
+    for (let i = 0; i < totalSuns; i++) {
+      const sun = document.createElement('div');
+      sun.className = 'sun-particle';
+      
+      const size = Math.random() * 14 + 10;
+      const posX = Math.random() * 80 + 10;
+      const posY = Math.random() * 180 + 10;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const duration = Math.random() * 2 + 2;
+      const delay = Math.random() * 2;
+
+      sun.style.width = `${size}px`;
+      sun.style.height = `${size}px`;
+      sun.style.left = `${posX}%`;
+      sun.style.top = `${posY}px`;
+      sun.style.backgroundColor = color;
+      sun.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
+      sun.style.animationDuration = `${duration}s`;
+      sun.style.animationDelay = `${delay}s`;
+
+      container.appendChild(sun);
+    }
+  </script>
+</body>
+</html>
+

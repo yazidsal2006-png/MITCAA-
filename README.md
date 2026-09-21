@@ -1,2 +1,0 @@
-# MITCAA-
-Cita con Mitca
