@@ -1,358 +1,414 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flor Dorada Mágica - Enredados</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f7f4d2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para Ti, Mitca</title>
+  <style>
+    :root {
+      --bg-color: #0b0d19;
+      --text-color: #ffffff;
+      --accent-color: #ffd700;
+    }
 
-        h1 {
-            color: #5c4308;
-            margin-bottom: 5px;
-            font-size: 24px;
-            text-shadow: 0 0 10px rgba(255, 223, 100, 0.5);
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        p {
-            color: #7a632a;
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-        canvas {
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(80, 60, 20, 0.15);
-            background: radial-gradient(circle, #fffbe6 0%, #f4eca6 100%);
-        }
+    /* PRIMERA PARTE: TEXTO INICIAL Y 13 FLORES */
+    .section {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
 
-        .controls {
-            margin-top: 15px;
-            display: flex;
-            gap: 15px;
-        }
+    .welcome-title {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      color: var(--accent-color);
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
 
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #fce055, #df9f12);
-            color: #3b2800;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-        }
+    .welcome-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 35px;
+    }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(255, 200, 0, 0.4);
-        }
-    </style>
+    .flowers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+      max-width: 550px;
+      width: 100%;
+      gap: 15px;
+      justify-items: center;
+      margin-bottom: 40px;
+    }
+
+    .interactive-flower {
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .interactive-flower:hover {
+      transform: scale(1.2);
+    }
+
+    .interactive-flower svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.5));
+    }
+
+    /* SEGUNDA PARTE: CUENTA REGRESIVA */
+    .countdown-container {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 215, 0, 0.25);
+      border-radius: 16px;
+      padding: 20px 30px;
+      margin: 20px 0 40px 0;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .countdown-title {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: var(--accent-color);
+      letter-spacing: 1px;
+    }
+
+    .timer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    .timer-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .timer-unit span {
+      font-size: 0.75rem;
+      font-weight: normal;
+      opacity: 0.75;
+      margin-top: 4px;
+    }
+
+    /* TERCERA PARTE: NUEVA FLOR ENREDADA (ESTILO IMAGEN ILUSTRADA) */
+    .flower-stage {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      height: 480px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    /* Movimiento de viento muy lento */
+    .wind-sway {
+      transform-origin: bottom center;
+      animation: slowWind 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes slowWind {
+      0% { transform: rotate(-1.5deg); }
+      50% { transform: rotate(1deg); }
+      100% { transform: rotate(-0.8deg); }
+    }
+
+    /* Crecimiento progresivo de la flor */
+    .flower-growth {
+      transform-origin: bottom center;
+      animation: emerge 3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    @keyframes emerge {
+      0% { transform: scale(0) translateY(80px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    /* Contenedor de brillos en forma de sol */
+    .sun-sparkles-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .sun-sparkle {
+      position: absolute;
+      bottom: 40px;
+      animation: ascend 4.5s linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes ascend {
+      0% {
+        transform: translateY(0) scale(0.4) rotate(0deg);
+        opacity: 0;
+      }
+      25% {
+        opacity: 0.9;
+      }
+      75% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-300px) scale(1) rotate(120deg);
+        opacity: 0;
+      }
+    }
+
+    /* DEDICATORIA FINAL SOLICITADA */
+    .final-text {
+      margin-top: 35px;
+      margin-bottom: 60px;
+      font-size: 1.15rem;
+      color: #ffffff;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .white-heart {
+      color: #ffffff;
+      display: inline-block;
+      margin-left: 3px;
+    }
+  </style>
 </head>
 <body>
 
-    <h1>La Flor Dorada Mágica</h1>
-    <p>Observa el crecimiento desde la semilla hasta el florecimiento solar</p>
+  <div class="section">
+    <!-- Texto inicial -->
+    <h1 class="welcome-title">Para la persona más especial</h1>
+    <p class="welcome-subtitle">Haz clic en cada una de las 13 flores...</p>
 
-    <canvas id="flowerCanvas" width="600" height="650"></canvas>
+    <!-- 13 Flores Interactivas -->
+    <div class="flowers-grid" id="flowersGrid"></div>
 
-    <div class="controls">
-        <button onclick="reiniciarAnimacion()">Reiniciar Crecimiento</button>
+    <!-- Cuenta Regresiva -->
+    <div class="countdown-container">
+      <div class="countdown-title">Tiempo a tu lado</div>
+      <div class="timer">
+        <div class="timer-unit"><div id="days">00</div><span>Días</span></div>
+        <div class="timer-unit"><div id="hours">00</div><span>Horas</span></div>
+        <div class="timer-unit"><div id="minutes">00</div><span>Minutos</span></div>
+        <div class="timer-unit"><div id="seconds">00</div><span>Segundos</span></div>
+      </div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('flowerCanvas');
-        const ctx = canvas.getContext('2d');
+    <!-- Reemplazo de la flor: Estilo de la imagen con 3 flores brillantes y hojas -->
+    <div class="flower-stage">
+      <div class="sun-sparkles-layer" id="sparklesLayer"></div>
 
-        // Configuración y variables del estado
-        let progress = 0; // 0 (Semilla) a 1 (Flor completada)
-        let particles = [];
-        const maxParticles = 90;
-        const colors = ['#ffffff', '#fff466', '#ffcc00', '#ba66ff', '#e099ff']; // Blanco, Amarillo, Morado
+      <div class="wind-sway flower-growth" style="width: 100%; height: 100%;">
+        <svg viewBox="0 0 300 400" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="stemGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stop-color="#2a082e"/>
+              <stop offset="100%" stop-color="#e02885"/>
+            </linearGradient>
 
-        // Clase para las partículas de brillo mágico
-        class Particle {
-            constructor(x, y) {
-                this.reset(x, y);
-            }
+            <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#c41c7a"/>
+              <stop offset="100%" stop-color="#3d0840"/>
+            </linearGradient>
 
-            reset(x, y) {
-                this.x = x + (Math.random() - 0.5) * 60;
-                this.y = y + (Math.random() - 0.5) * 60;
-                this.size = Math.random() * 3.5 + 1;
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                this.vy = -(Math.random() * 1.5 + 0.5);
-                this.vx = (Math.random() - 0.5) * 0.8;
-                this.alpha = 1;
-                this.decay = Math.random() * 0.02 + 0.008;
-            }
+            <linearGradient id="petalGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stop-color="#d81b75"/>
+              <stop offset="60%" stop-color="#ff60a8"/>
+              <stop offset="100%" stop-color="#ffc2e2"/>
+            </linearGradient>
 
-            update(targetX, targetY) {
-                this.y += this.vy;
-                this.x += this.vx;
-                this.alpha -= this.decay;
+            <filter id="pinkGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="5" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
 
-                if (this.alpha <= 0) {
-                    this.reset(targetX, targetY);
-                }
-            }
+          <!-- Pasto verdoso oscuro de fondo -->
+          <path d="M 15 400 Q 25 270 60 190 Q 35 280 15 400" fill="#0c382b" opacity="0.6"/>
+          <path d="M 285 400 Q 265 260 220 170 Q 255 270 285 400" fill="#0c382b" opacity="0.6"/>
 
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = Math.max(0, this.alpha);
-                ctx.fillStyle = this.color;
-                ctx.shadowColor = this.color;
-                ctx.shadowBlur = 8;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
-        }
+          <!-- Tallos fucsia/morados -->
+          <path d="M 150 390 Q 148 230 150 100" stroke="url(#stemGradient)" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M 150 270 Q 110 210 80 140" stroke="url(#stemGradient)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <path d="M 150 250 Q 190 190 220 120" stroke="url(#stemGradient)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
 
-        // Inicializar partículas
-        for (let i = 0; i < maxParticles; i++) {
-            particles.push(new Particle(300, 500));
-        }
+          <!-- Ramas de hojas tupidas en la base -->
+          <g fill="url(#leafGradient)">
+            <path d="M 150 350 C 120 338 90 352 68 368 C 98 373 128 363 150 350 Z"/>
+            <path d="M 150 350 C 180 338 210 352 232 368 C 202 373 172 363 150 350 Z"/>
+            <path d="M 150 318 C 112 302 82 318 60 338 C 90 342 120 332 150 318 Z"/>
+            <path d="M 150 318 C 188 302 218 318 240 338 C 210 342 180 332 150 318 Z"/>
+            <path d="M 150 288 C 122 272 98 288 82 302 C 106 308 130 298 150 288 Z"/>
+            <path d="M 150 288 C 178 272 202 288 218 302 C 194 308 170 298 150 288 Z"/>
+          </g>
 
-        function reiniciarAnimacion() {
-            progress = 0;
-        }
+          <!-- Flor Principal (Arriba) -->
+          <g transform="translate(150, 95)" filter="url(#pinkGlow)">
+            <circle cx="0" cy="0" r="9" fill="#ffffff"/>
+            <path d="M 0 0 C -15 -18 -18 -32 0 -42 C 18 -32 15 -18 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C -32 -14 -42 0 -32 16 C -18 14 -8 4 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C 32 -14 42 0 32 16 C 18 14 8 4 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C -22 10 -22 28 -4 30 C 0 18 0 8 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C 22 10 22 28 4 30 C 0 18 0 8 0 0" fill="url(#petalGradient)"/>
+          </g>
 
-        // Dibujar Semilla
-        function drawSeed(x, y, scale) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.scale(scale, scale);
+          <!-- Flor Izquierda -->
+          <g transform="translate(80, 135) rotate(-16)" filter="url(#pinkGlow)">
+            <circle cx="0" cy="0" r="7" fill="#ffffff"/>
+            <path d="M 0 0 C -12 -15 -15 -26 0 -34 C 15 -26 12 -15 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C -26 -11 -34 0 -26 13 C -15 11 -7 3 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C 26 -11 34 0 28 13 C 15 11 7 3 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C -18 8 -18 22 -3 24 C 0 14 0 6 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C 18 8 18 22 3 24 C 0 14 0 6 0 0" fill="url(#petalGradient)"/>
+          </g>
 
-            // Trama/Suelo
-            ctx.fillStyle = '#4a3525';
-            ctx.beginPath();
-            ctx.ellipse(0, 20, 70, 15, 0, 0, Math.PI * 2);
-            ctx.fill();
+          <!-- Flor Derecha -->
+          <g transform="translate(220, 115) rotate(16)" filter="url(#pinkGlow)">
+            <circle cx="0" cy="0" r="7" fill="#ffffff"/>
+            <path d="M 0 0 C -12 -15 -15 -26 0 -34 C 15 -26 12 -15 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C -26 -11 -34 0 -26 13 C -15 11 -7 3 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C 26 -11 34 0 28 13 C 15 11 7 3 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C -18 8 -18 22 -3 24 C 0 14 0 6 0 0" fill="url(#petalGradient)"/>
+            <path d="M 0 0 C 18 8 18 22 3 24 C 0 14 0 6 0 0" fill="url(#petalGradient)"/>
+          </g>
+        </svg>
+      </div>
+    </div>
 
-            // Cuerpo de la semilla (forma similar al Sol de Corona)[span_1](start_span)[span_1](end_span)
-            ctx.fillStyle = '#6b3d1b';
-            ctx.beginPath();
-            ctx.arc(0, 0, 16, 0, Math.PI * 2);
-            ctx.fill();
+    <!-- Dedicatoria final solicitada -->
+    <div class="final-text">
+      con mucho amor de Yazid, ¿para quién más? si solo para ti, Mitca <span class="white-heart">🤍</span>
+    </div>
+  </div>
 
-            ctx.fillStyle = '#9b4dca'; // Morado del núcleo
-            ctx.beginPath();
-            ctx.arc(0, 0, 10, 0, Math.PI * 2);
-            ctx.fill();
+  <script>
+    // Generar las 13 flores interactivas iniciales
+    const flowersGrid = document.getElementById('flowersGrid');
+    const goldenFlowerSVG = `
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="11" fill="#ffd700" />
+        <g fill="#ffb700" opacity="0.95">
+          <path d="M 50 12 C 43 30 57 30 50 12 Z"/>
+          <path d="M 50 88 C 43 70 57 70 50 88 Z"/>
+          <path d="M 12 50 C 30 43 30 57 12 50 Z"/>
+          <path d="M 88 50 C 70 43 70 57 88 50 Z"/>
+          <path d="M 23 23 C 38 36 48 26 23 23 Z"/>
+          <path d="M 77 77 C 62 64 52 74 77 77 Z"/>
+          <path d="M 23 77 C 36 62 26 52 23 77 Z"/>
+          <path d="M 77 23 C 64 38 74 48 77 23 Z"/>
+        </g>
+      </svg>
+    `;
 
-            // Picos solares dorados alrededor de la semilla
-            ctx.fillStyle = '#f5c518';
-            for (let i = 0; i < 8; i++) {
-                let angle = (i * Math.PI / 4);
-                ctx.beginPath();
-                ctx.moveTo(Math.cos(angle) * 14, Math.sin(angle) * 14);
-                ctx.lineTo(Math.cos(angle) * 25, Math.sin(angle) * 25);
-                ctx.lineTo(Math.cos(angle + 0.2) * 16, Math.sin(angle + 0.2) * 16);
-                ctx.fill();
-            }
+    for (let i = 0; i < 13; i++) {
+      const flower = document.createElement('div');
+      flower.className = 'interactive-flower';
+      flower.innerHTML = goldenFlowerSVG;
+      flower.addEventListener('click', () => {
+        flower.style.transform = 'scale(1.35) rotate(12deg)';
+        setTimeout(() => {
+          flower.style.transform = 'scale(1)';
+        }, 350);
+      });
+      flowersGrid.appendChild(flower);
+    }
 
-            ctx.restore();
-        }
+    // Lógica de la cuenta regresiva
+    const anniversaryDate = new Date('2025-07-16T00:00:00');
+    function updateCountdown() {
+      const now = new Date();
+      const diff = now - anniversaryDate;
 
-        // Dibujar Tallo y Hojas
-        function drawPlant(stemHeight) {
-            const startX = 300;
-            const startY = 520;
-            const endY = startY - stemHeight;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / 1000 / 60) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
 
-            // Curva del tallo
-            ctx.save();
-            ctx.strokeStyle = '#1d4a34';
-            ctx.lineWidth = 10;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(startX, startY);
-            
-            // Creación de una curva elegante para el tallo
-            let controlX = startX + Math.sin(progress * Math.PI) * 40;
-            ctx.quadraticCurveTo(controlX, startY - stemHeight / 2, startX + 15, endY);
-            ctx.stroke();
+      document.getElementById('days').innerText = String(days).padStart(2, '0');
+      document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+      document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+      document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
 
-            // Hojas inferiores
-            if (progress > 0.15) {
-                let leafScale = Math.min(1, (progress - 0.15) * 2);
-                drawLeaf(startX - 10, startY - 40, -0.8, leafScale);
-                drawLeaf(startX + 10, startY - 60, 0.7, leafScale);
-            }
+    // Generador de brillos en forma de sol (Amarillo, Blanco, Morado)
+    const sparklesLayer = document.getElementById('sparklesLayer');
+    const sparkleColors = ['#ffd700', '#ffffff', '#e0b0ff'];
 
-            if (progress > 0.4) {
-                let leafScale = Math.min(1, (progress - 0.4) * 2);
-                drawLeaf(startX - 12, startY - 120, -0.6, leafScale * 0.9);
-                drawLeaf(startX + 12, startY - 150, 0.5, leafScale * 0.9);
-            }
+    function spawnSunSparkle() {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 20 20");
+      
+      const size = Math.random() * 10 + 10;
+      svg.style.width = `${size}px`;
+      svg.style.height = `${size}px`;
+      svg.classList.add('sun-sparkle');
 
-            ctx.restore();
-            return { x: startX + 15, y: endY };
-        }
+      svg.style.left = `${Math.random() * 75 + 12}%`;
+      
+      const duration = Math.random() * 2.5 + 3.5;
+      svg.style.animationDuration = `${duration}s`;
 
-        function drawLeaf(x, y, angle, scale) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(angle);
-            ctx.scale(scale, scale);
+      const color = sparkleColors[Math.floor(Math.random() * sparkleColors.length)];
 
-            ctx.fillStyle = '#215c40';
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.bezierCurveTo(-20, -20, -40, -10, -50, 10);
-            ctx.bezierCurveTo(-20, 25, 0, 10, 0, 0);
-            ctx.fill();
+      svg.innerHTML = `
+        <circle cx="10" cy="10" r="3" fill="${color}" />
+        <g stroke="${color}" stroke-width="1.2">
+          <line x1="10" y1="1" x2="10" y2="4" />
+          <line x1="10" y1="16" x2="10" y2="19" />
+          <line x1="1" y1="10" x2="4" y2="10" />
+          <line x1="16" y1="10" x2="19" y2="10" />
+          <line x1="3.5" y1="3.5" x2="5.5" y2="5.5" />
+          <line x1="14.5" y1="14.5" x2="16.5" y2="16.5" />
+          <line x1="3.5" y1="16.5" x2="5.5" y2="14.5" />
+          <line x1="14.5" y1="5.5" x2="16.5" y2="3.5" />
+        </g>
+      `;
 
-            // Venas de la hoja
-            ctx.strokeStyle = '#32825c';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.quadraticCurveTo(-25, 0, -45, 8);
-            ctx.stroke();
+      sparklesLayer.appendChild(svg);
 
-            ctx.restore();
-        }
+      setTimeout(() => {
+        svg.remove();
+      }, duration * 1000);
+    }
 
-        // Dibujar Flor con la forma del Sol de Enredados[span_2](start_span)[span_2](end_span)
-        function drawSunFlower(x, y, bloomProgress) {
-            ctx.save();
-            ctx.translate(x, y);
-
-            // Resplandor del sol
-            let glow = ctx.createRadialGradient(0, 0, 10, 0, 0, 120 * bloomProgress);
-            glow.addColorStop(0, 'rgba(255, 245, 150, 0.8)');
-            glow.addColorStop(0.5, 'rgba(255, 200, 50, 0.3)');
-            glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(0, 0, 130 * bloomProgress, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Centro morado brillante (Corazón de la flor)
-            ctx.fillStyle = '#83289e';
-            ctx.beginPath();
-            ctx.arc(0, 0, 22 * bloomProgress, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Petalitos Morados Interiores
-            ctx.fillStyle = '#b04cd9';
-            for (let i = 0; i < 8; i++) {
-                let angle = (i * Math.PI / 4);
-                ctx.save();
-                ctx.rotate(angle);
-                ctx.beginPath();
-                ctx.ellipse(0, 18 * bloomProgress, 5 * bloomProgress, 12 * bloomProgress, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
-
-            // Pétalos Principales en Forma de Rayos Solares (Emblema de Corona)[span_3](start_span)[span_3](end_span)
-            const petalCount = 8;
-            for (let i = 0; i < petalCount; i++) {
-                let angle = (i * Math.PI / 4);
-                ctx.save();
-                ctx.rotate(angle);
-
-                // Gradiente del pétalo (Amarillo a Naranja/Morado en la base)
-                let petalGrad = ctx.createLinearGradient(0, 0, 0, 95 * bloomProgress);
-                petalGrad.addColorStop(0, '#a239b5'); // Toque morado base
-                petalGrad.addColorStop(0.2, '#fca311'); // Naranja brillante
-                petalGrad.addColorStop(0.6, '#ffda33'); // Amarillo sol
-                petalGrad.addColorStop(1, '#fff6a8'); // Punta brillante
-
-                ctx.fillStyle = petalGrad;
-
-                // Forma de rayo solar curvado
-                ctx.beginPath();
-                ctx.moveTo(0, 10 * bloomProgress);
-                ctx.bezierCurveTo(25 * bloomProgress, 35 * bloomProgress, 30 * bloomProgress, 65 * bloomProgress, 0, 95 * bloomProgress);
-                ctx.bezierCurveTo(-30 * bloomProgress, 65 * bloomProgress, -25 * bloomProgress, 35 * bloomProgress, 0, 10 * bloomProgress);
-                ctx.fill();
-
-                // Borde/Detalle dorado del pétalo
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 1.5 * bloomProgress;
-                ctx.stroke();
-
-                ctx.restore();
-            }
-
-            // Pistilos dorados en el centro
-            ctx.strokeStyle = '#ffe875';
-            ctx.lineWidth = 2;
-            for (let i = 0; i < 5; i++) {
-                let angle = (i * Math.PI / 2.5) - Math.PI / 2;
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.quadraticCurveTo(Math.cos(angle) * 15, Math.sin(angle) * 15, Math.cos(angle) * 30 * bloomProgress, Math.sin(angle) * 30 * bloomProgress);
-                ctx.stroke();
-
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(Math.cos(angle) * 30 * bloomProgress, Math.sin(angle) * 30 * bloomProgress, 3 * bloomProgress, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            ctx.restore();
-        }
-
-        // Bucle Principal de Animación
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Incrementar progreso
-            if (progress < 1) {
-                progress += 0.0025;
-            }
-
-            // 1. Fase de Semilla (0 a 0.25)
-            if (progress < 0.25) {
-                let seedScale = 1 - (progress / 0.25) * 0.3;
-                drawSeed(300, 520, seedScale);
-            }
-
-            // 2. Fase de Tallo y Crecimiento (0.15 a 0.7)
-            let stemProgress = Math.max(0, Math.min(1, (progress - 0.1) / 0.6));
-            let stemHeight = stemProgress * 300;
-            let flowerPos = drawPlant(stemHeight);
-
-            // 3. Fase de Florecimiento (0.5 a 1.0)
-            let bloomProgress = Math.max(0, (progress - 0.5) / 0.5);
-            if (bloomProgress > 0) {
-                drawSunFlower(flowerPos.x, flowerPos.y, bloomProgress);
-            }
-
-            // Renderizar y actualizar brillos mágicos (Blanco, Amarillo, Morado)
-            let particleTargetY = flowerPos.y;
-            let particleTargetX = flowerPos.x;
-
-            particles.forEach(p => {
-                p.update(particleTargetX, particleTargetY);
-                p.draw();
-            });
-
-            requestAnimationFrame(animate);
-        }
-
-        // Iniciar la animación
-        animate();
-    </script>
+    setInterval(spawnSunSparkle, 320);
+  </script>
 </body>
 </html>
