@@ -1,606 +1,505 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flor Dorada Mágica - Enredados (3D)</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- OrbitControls -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regalo Especial</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        body {
-            font-family: 'Cinzel', serif;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #020306;
-            color: #f8fafc;
-            user-select: none;
-        }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0d0118 0%, #20002c 50%, #000000 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
 
-        #canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1;
-            opacity: 0;
-            transition: opacity 1.5s ease;
-        }
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-        .magic-aura {
-            position: absolute;
-            top: 42%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 65vw;
-            height: 65vw;
-            max-width: 620px;
-            max-height: 620px;
-            background: radial-gradient(circle, rgba(255, 220, 90, 0.42) 0%, rgba(255, 150, 20, 0.22) 35%, rgba(190, 70, 240, 0.14) 60%, transparent 75%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 2;
-            filter: blur(50px);
-            animation: pulseAura 4s ease-in-out infinite alternate;
-            opacity: 0;
-            transition: opacity 1.5s ease;
-        }
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
 
-        @keyframes pulseAura {
-            0% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.75; }
-            100% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
-        }
+    p.subtitle {
+      font-size: 1.1rem;
+      color: #e0e0e0;
+      margin-bottom: 25px;
+    }
 
-        .ui-overlay {
-            position: relative;
-            z-index: 10;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 1.5s ease;
-        }
+    /* Estilos del Temporizador */
+    .countdown-title {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      color: #ffb703;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
 
-        .interactive {
-            pointer-events: auto;
-        }
+    .countdown-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
 
-        .glass-card {
-            background: rgba(6, 10, 18, 0.78);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 215, 100, 0.28);
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85), inset 0 0 15px rgba(255, 200, 50, 0.1);
-        }
+    .time-box {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      padding: 12px;
+      border-radius: 12px;
+      min-width: 75px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
 
-        .custom-range::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #ffe066;
-            cursor: pointer;
-            box-shadow: 0 0 12px #ffb700;
-        }
+    .time-box:hover {
+      transform: translateY(-3px);
+      border-color: #ffd700;
+    }
 
-        /* Pantalla de Cuenta Regresiva */
-        #countdown-screen {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle, #0b1326 0%, #020306 100%);
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 1s ease, visibility 1s ease;
-        }
-    </style>
+    .time-box span {
+      display: block;
+    }
+
+    .number {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
+
+    .label {
+      font-size: 0.75rem;
+      color: #ffd700;
+      text-transform: uppercase;
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+
+    /* Estilos adicionales para el Canvas y Controles de la Flor */
+    .flower-header-container {
+      text-align: center;
+      margin-top: 35px;
+      z-index: 10;
+      padding: 0 20px;
+    }
+
+    .flower-header-container h2 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+      margin: 0;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      background: linear-gradient(45deg, #fff, #ffd700, #ff84e8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      height: 60vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 15px;
+    }
+
+    canvas {
+      display: block;
+      cursor: pointer;
+    }
+
+    .controls {
+      margin-top: 15px;
+      margin-bottom: 25px;
+      z-index: 10;
+      display: flex;
+      gap: 15px;
+      background: rgba(20, 20, 20, 0.8);
+      padding: 10px 20px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    .color-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .color-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .color-btn.active {
+      transform: scale(1.2);
+      box-shadow: 0 0 15px currentColor;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Pantalla de Cuenta Regresiva -->
-    <div id="countdown-screen">
-        <div class="text-center p-6 glass-card rounded-3xl max-w-md mx-4 border border-amber-500/30 shadow-2xl">
-            <i class="fa-solid fa-seedling text-4xl text-amber-400 mb-4 animate-bounce"></i>
-            <h2 class="text-xl md:text-2xl font-bold tracking-widest text-amber-100 uppercase mb-2">Despertando la Flor</h2>
-            <p class="text-xs text-amber-300/70 font-sans mb-6">Elpoder del sol dorado se manifestará en:</p>
-            
-            <!-- Reloj de cuenta regresiva (ejemplo de 5 segundos para prueba, cámbialo a tu gusto) -->
-            <div id="timer-display" class="text-5xl font-black text-amber-400 tracking-wider mb-6">
-                05
-            </div>
-            
-            <button onclick="triggerReveal()" class="text-xs font-sans text-amber-200 bg-amber-500/20 hover:bg-amber-500/40 border border-amber-400/40 px-4 py-2 rounded-full transition-all">
-                Saltar cuenta (Prueba)
-            </button>
-        </div>
+  <div class="container">
+    <h1>Flor Dorada Interactiva</h1>
+    <p class="subtitle">Un detalle especial preparado para ti</p>
+
+    <!-- Cuenta Regresiva -->
+    <div class="countdown-title">Tiempo restante</div>
+    <div class="countdown-container">
+      <div class="time-box">
+        <span class="number" id="days">00</span>
+        <span class="label">Días</span>
+      </div>
+      <div class="time-box">
+        <span class="number" id="hours">00</span>
+        <span class="label">Horas</span>
+      </div>
+      <div class="time-box">
+        <span class="number" id="minutes">00</span>
+        <span class="label">Minutos</span>
+      </div>
+      <div class="time-box">
+        <span class="number" id="seconds">00</span>
+        <span class="label">Segundos</span>
+      </div>
     </div>
+  </div>
 
-    <!-- Elementos 3D y UI de la Flor (Ocultos inicialmente) -->
-    <div class="magic-aura" id="magicAura"></div>
-    <div id="canvas-container"></div>
+  <script>
+    // Configuración de la cuenta regresiva (Ajusta la fecha si lo necesitas)
+    const targetDate = new Date("July 16, 2026 00:00:00").getTime();
 
-    <div class="ui-overlay min-h-screen flex flex-col justify-between p-4 md:p-6" id="uiOverlay">
-        <header class="flex justify-between items-start">
-            <div class="glass-card p-4 rounded-2xl max-w-xs md:max-w-sm interactive">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-400 to-amber-200 flex items-center justify-center shadow-lg shadow-amber-500/40">
-                        <i class="fa-solid fa-wand-magic-sparkles text-slate-950 text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-sm md:text-base font-black text-amber-100 tracking-wider">FLOR DORADA MÁGICA</h1>
-                        <p class="text-[11px] font-sans text-amber-300/80">Edición Sundrop de Enredados</p>
-                    </div>
-                </div>
-            </div>
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
 
-            <div class="flex gap-2 interactive">
-                <button id="rotateBtn" title="Auto-Rotación" class="glass-card w-11 h-11 rounded-xl flex items-center justify-center text-amber-300 hover:text-white hover:border-amber-400 transition-all">
-                    <i class="fa-solid fa-rotate"></i>
-                </button>
-                <button id="resetCamBtn" title="Restablecer Vista" class="glass-card w-11 h-11 rounded-xl flex items-center justify-center text-amber-200 hover:text-white hover:border-amber-400 transition-all">
-                    <i class="fa-solid fa-crosshairs"></i>
-                </button>
-                <button id="toggleControlsBtn" title="Ajustes" class="glass-card w-11 h-11 rounded-xl flex items-center justify-center text-amber-200 hover:text-white hover:border-amber-400 transition-all">
-                    <i class="fa-solid fa-sliders"></i>
-                </button>
-            </div>
-        </header>
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-        <div class="self-center glass-card px-5 py-2 rounded-full text-[11px] font-sans text-amber-200/90 tracking-wider uppercase flex items-center gap-2 border-amber-400/30 shadow-lg">
-            <i class="fa-solid fa-hand-pointer text-amber-400 animate-bounce"></i> Rotación 3D en 360° | Zoom con Rueda o Pinza
-        </div>
+        document.getElementById("days").innerText = days < 10 ? '0' + days : days;
+        document.getElementById("hours").innerText = hours < 10 ? '0' + hours : hours;
+        document.getElementById("minutes").innerText = minutes < 10 ? '0' + minutes : minutes;
+        document.getElementById("seconds").innerText = seconds < 10 ? '0' + seconds : seconds;
+      } else {
+        document.getElementById("days").innerText = "00";
+        document.getElementById("hours").innerText = "00";
+        document.getElementById("minutes").innerText = "00";
+        document.getElementById("seconds").innerText = "00";
+      }
+    }
 
-        <footer class="flex justify-center">
-            <div id="controlsPanel" class="glass-card p-5 rounded-2xl w-full max-w-xl interactive transition-all duration-300">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-sans text-xs">
-                    <div>
-                        <div class="flex justify-between text-amber-200 mb-1">
-                            <span class="font-medium"><i class="fa-solid fa-sun text-amber-400 mr-1"></i> Resplandor</span>
-                            <span id="goldVal">4.2</span>
-                        </div>
-                        <input type="range" id="goldSlider" min="0.5" max="7.0" step="0.1" value="4.2" class="w-full custom-range h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-amber-200 mb-1">
-                            <span class="font-medium"><i class="fa-solid fa-heart text-purple-400 mr-1"></i> Núcleo</span>
-                            <span id="purpleVal">3.2</span>
-                        </div>
-                        <input type="range" id="purpleSlider" min="0" max="6.0" step="0.1" value="3.2" class="w-full custom-range h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-amber-200 mb-1">
-                            <span class="font-medium"><i class="fa-solid fa-sparkles text-amber-300 mr-1"></i> Polvo</span>
-                            <span id="partVal">1.2</span>
-                        </div>
-                        <input type="range" id="partSlider" min="0.2" max="3.0" step="0.1" value="1.2" class="w-full custom-range h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </div>
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+  </script>
 
-    <script>
-        let scene, camera, renderer, controls;
-        let flowerGroup, petalsGroup, stamensGroup, particleSystem;
-        let goldLight, purpleLight;
-        let autoRotate = false;
-        let threeInitialized = false;
-        const clock = new THREE.Clock();
+  <!-- Sección de la Flor Interactiva -->
+  <div class="flower-header-container">
+    <h2>Con Mucho Amor de Yazid Para... ¿quién más? sino solo para ti Mitca 🤍</h2>
+  </div>
 
-        const COLOR_PALETTE = {
-            petalYellow: 0xffd23a,
-            petalOrange: 0xffa000,
-            petalInnerGlow: 0xffffaa,
-            magentaHeart: 0xe040ff,
-            magentaDot: 0xff88ff,
-            stemGreen: 0x112b0e,
-            leafDeepGreen: 0x14330f,
-            leafLightGreen: 0x2e6b23,
-            rockColor: 0x161a13
-        };
+  <div class="canvas-container">
+    <canvas id="flowerCanvas"></canvas>
+  </div>
 
-        // Lógica de la cuenta regresiva
-        let timeLeft = 5; // Cambia los segundos que desees
-        const timerInterval = setInterval(() => {
-            timeLeft--;
-            if (timeLeft < 10 && timeLeft >= 0) {
-                document.getElementById('timer-display').textContent = "0" + timeLeft;
-            } else if (timeLeft >= 10) {
-                document.getElementById('timer-display').textContent = timeLeft;
-            }
+  <div class="controls">
+    <div class="color-btn active" style="background: #ffd700; color: #ffd700;" onclick="setTheme('gold', event)" title="Oro Puro"></div>
+    <div class="color-btn" style="background: #00ffff; color: #00ffff;" onclick="setTheme('blue', event)" title="Azul Etéreo"></div>
+    <div class="color-btn" style="background: #ff66cc; color: #ff66cc;" onclick="setTheme('pink', event)" title="Rosa Místico"></div>
+  </div>
 
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                triggerReveal();
-            }
-        }, 1000);
+  <script>
+    const canvas = document.getElementById('flowerCanvas');
+    const ctx = canvas.getContext('2d');
 
-        function triggerReveal() {
-            clearInterval(timerInterval);
-            const screen = document.getElementById('countdown-screen');
-            screen.style.opacity = '0';
-            screen.style.visibility = 'hidden';
+    function resize() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-            // Mostrar elementos 3D y UI
-            document.getElementById('canvas-container').style.opacity = '1';
-            document.getElementById('magicAura').style.opacity = '1';
-            document.getElementById('uiOverlay').style.opacity = '1';
+    // Temas de color
+    let currentTheme = 'gold';
+    const themes = {
+      gold: { primary: '#ffe652', secondary: '#ffb700', core: '#fff9cc', glow: 'rgba(255, 215, 0, 0.6)' },
+      blue: { primary: '#52ffff', secondary: '#00a6ff', core: '#ccffff', glow: 'rgba(0, 242, 255, 0.6)' },
+      pink: { primary: '#ff66cc', secondary: '#ff1493', core: '#ffccf2', glow: 'rgba(255, 105, 180, 0.6)' }
+    };
 
-            if (!threeInitialized) {
-                init();
-                animate();
-                threeInitialized = true;
-            }
+    function setTheme(themeName, event) {
+      currentTheme = themeName;
+      document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
+    }
+
+    // Animación de entrada temporal (0 a 1 en 3 segundos)
+    let animProgress = 0;
+    const animDuration = 3000; // ms
+    let startTime = null;
+
+    function updateAnimation(timestamp) {
+      if (!startTime) startTime = timestamp;
+      let elapsed = timestamp - startTime;
+      animProgress = Math.min(elapsed / animDuration, 1);
+    }
+
+    // Partículas en forma de sol
+    class SunParticle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 50;
+        this.size = Math.random() * 4 + 3;
+        this.speedY = Math.random() * 0.8 + 0.3;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.alpha = Math.random() * 0.6 + 0.2;
+        this.rotation = Math.random() * Math.PI;
+        this.rotSpeed = (Math.random() - 0.5) * 0.02;
+      }
+      update() {
+        this.y -= this.speedY;
+        this.x += this.speedX;
+        this.rotation += this.rotSpeed;
+        if (this.y < -20) this.reset();
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.fillStyle = themes[currentTheme].core;
+        ctx.globalAlpha = this.alpha;
+        
+        // Forma de sol (pequeños rayos)
+        for (let i = 0; i < 4; i++) {
+          ctx.fillRect(-this.size/2, -this.size/8, this.size, this.size/4);
+          ctx.rotate(Math.PI / 4);
+        }
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size / 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+      }
+    }
+
+    // Explosión al hacer clic
+    class SunParticleBurst {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 5 + 1;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.size = Math.random() * 5 + 3;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.03 + 0.01;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.fillStyle = themes[currentTheme].core;
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    const particles = Array.from({ length: 45 }, () => new SunParticle());
+    let burstParticles = [];
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      for (let i = 0; i < 25; i++) {
+        burstParticles.push(new SunParticleBurst(x, y));
+      }
+    });
+
+    // Función para dibujar la flor y su estructura
+    function drawFlower(progress) {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2 + 30;
+
+      const theme = themes[currentTheme];
+
+      // 1. Tallo y crecimiento vertical
+      const stemHeight = 180 * Math.min(progress * 1.5, 1);
+      const startY = cy + 120;
+      const endY = startY - stemHeight;
+
+      ctx.strokeStyle = '#1e3d1e';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(cx, startY);
+      ctx.quadraticCurveTo(cx - 15, startY - stemHeight / 2, cx, endY);
+      ctx.stroke();
+
+      // 2. Hojas simétricas a los lados del tallo
+      const leafProgress = Math.max(0, (progress - 0.3) / 0.7);
+      if (leafProgress > 0) {
+        ctx.fillStyle = '#224a22';
+        
+        // Hoja izquierda
+        ctx.save();
+        ctx.translate(cx - 5, startY - 70);
+        ctx.scale(leafProgress, leafProgress);
+        ctx.beginPath();
+        ctx.rotate(-0.5);
+        ctx.ellipse(-35, 0, 45, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Hoja derecha (simétrica)
+        ctx.save();
+        ctx.translate(cx + 5, startY - 100);
+        ctx.scale(leafProgress, leafProgress);
+        ctx.beginPath();
+        ctx.rotate(0.5);
+        ctx.ellipse(35, 0, 45, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Hojas inferiores base
+        ctx.save();
+        ctx.translate(cx, startY - 15);
+        ctx.scale(leafProgress, leafProgress);
+        ctx.beginPath();
+        ctx.ellipse(-40, 10, 50, 20, -0.3, 0, Math.PI * 2);
+        ctx.ellipse(40, 10, 50, 20, 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 3. Cabeza de la flor y pétalos
+      const flowerProgress = Math.max(0, (progress - 0.5) / 0.5);
+      if (flowerProgress > 0) {
+        ctx.save();
+        ctx.translate(cx, endY);
+        ctx.scale(flowerProgress, flowerProgress);
+
+        // Brillo ambiental trasero
+        const gradientGlow = ctx.createRadialGradient(0, 0, 10, 0, 0, 120);
+        gradientGlow.addColorStop(0, theme.glow);
+        gradientGlow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = gradientGlow;
+        ctx.beginPath();
+        ctx.arc(0, 0, 120, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pétalos principales
+        const petalCount = 6;
+        for (let i = 0; i < petalCount; i++) {
+          ctx.save();
+          ctx.rotate((i * Math.PI * 2) / petalCount);
+          
+          const petalGrad = ctx.createLinearGradient(0, 0, 0, -90);
+          petalGrad.addColorStop(0, theme.secondary);
+          petalGrad.addColorStop(1, theme.primary);
+          
+          ctx.fillStyle = petalGrad;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.bezierCurveTo(-35, -30, -45, -90, 0, -110);
+          ctx.bezierCurveTo(45, -90, 35, -30, 0, 0);
+          ctx.fill();
+          ctx.restore();
         }
 
-        function init() {
-            const container = document.getElementById('canvas-container');
+        // Centro brillante y estambres mágicos
+        ctx.fillStyle = theme.core;
+        ctx.beginPath();
+        ctx.arc(0, 0, 18, 0, Math.PI * 2);
+        ctx.fill();
 
-            scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x020306, 0.038);
+        // Estambre principal curvado con remolino
+        ctx.strokeStyle = theme.core;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(-25, -60, -40, -100);
+        ctx.stroke();
 
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-            camera.position.set(0, 1.8, 6.5);
+        // Pequeño brote en la punta del estambre
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-40, -100, 4, 0, Math.PI * 2);
+        ctx.fill();
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.35;
-            container.appendChild(renderer.domElement);
+        ctx.restore();
+      }
+    }
 
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.maxPolarAngle = Math.PI / 2 + 0.15;
-            controls.minDistance = 2.0;
-            controls.maxDistance = 12.0;
-            controls.target.set(0, 1.4, 0);
+    // Bucle principal de renderizado
+    function animate(timestamp) {
+      updateAnimation(timestamp);
 
-            setupLights();
-            buildMossyRockBase();
-            buildSundropFlower();
-            buildMagicParticles();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            window.addEventListener('resize', onWindowResize);
-            setupUI();
-        }
+      // Actualizar y dibujar partículas de fondo
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
 
-        function setupLights() {
-            const ambient = new THREE.AmbientLight(0x0b1326, 0.85);
-            scene.add(ambient);
+      // Dibujar la flor animada
+      drawFlower(animProgress);
 
-            const rimLight = new THREE.DirectionalLight(0x1e293b, 0.9);
-            rimLight.position.set(-4, 6, -4);
-            scene.add(rimLight);
+      // Actualizar y dibujar partículas de explosión
+      burstParticles.forEach((bp, index) => {
+        bp.update();
+        bp.draw();
+        if (bp.alpha <= 0) burstParticles.splice(index, 1);
+      });
 
-            goldLight = new THREE.PointLight(0xffbe2e, 4.2, 12, 1.1);
-            goldLight.position.set(0, 2.5, 0);
-            goldLight.castShadow = true;
-            goldLight.shadow.bias = -0.002;
-            scene.add(goldLight);
+      requestAnimationFrame(animate);
+    }
 
-            purpleLight = new THREE.PointLight(COLOR_PALETTE.magentaHeart, 3.2, 5, 1.4);
-            purpleLight.position.set(0, 2.45, 0.05);
-            scene.add(purpleLight);
-        }
+    requestAnimationFrame(animate);
+  </script>
 
-        function buildMossyRockBase() {
-            const baseGroup = new THREE.Group();
-            const rockGeo = new THREE.CylinderGeometry(3.2, 4.2, 1.2, 32, 10);
-            const pos = rockGeo.attributes.position;
-            for (let i = 0; i < pos.count; i++) {
-                const x = pos.getX(i);
-                const y = pos.getY(i);
-                const z = pos.getZ(i);
-                const noise = (Math.sin(x * 3.0) + Math.cos(z * 3.0)) * 0.18;
-                pos.setY(i, y + noise);
-            }
-            rockGeo.computeVertexNormals();
-
-            const rockMat = new THREE.MeshStandardMaterial({
-                color: COLOR_PALETTE.rockColor,
-                roughness: 0.92,
-                metalness: 0.08,
-                flatShading: true
-            });
-
-            const rock = new THREE.Mesh(rockGeo, rockMat);
-            rock.position.set(0, -0.6, 0);
-            rock.receiveShadow = true;
-            baseGroup.add(rock);
-            scene.add(baseGroup);
-        }
-
-        function buildSundropFlower() {
-            flowerGroup = new THREE.Group();
-            scene.add(flowerGroup);
-
-            const stemCurve = new THREE.CatmullRomCurve3([
-                new THREE.Vector3(0, -0.05, 0),
-                new THREE.Vector3(0.12, 0.7, -0.05),
-                new THREE.Vector3(-0.06, 1.6, 0.05),
-                new THREE.Vector3(0, 2.45, 0)
-            ]);
-
-            const stemGeo = new THREE.TubeGeometry(stemCurve, 64, 0.055, 12, false);
-            const stemMat = new THREE.MeshStandardMaterial({ color: COLOR_PALETTE.stemGreen, roughness: 0.5, metalness: 0.1 });
-            const stem = new THREE.Mesh(stemGeo, stemMat);
-            stem.castShadow = true;
-            flowerGroup.add(stem);
-
-            buildBaseFoliage(flowerGroup);
-            buildMidStemLeaves(flowerGroup, stemCurve);
-
-            petalsGroup = new THREE.Group();
-            petalsGroup.position.set(0, 2.45, 0);
-            flowerGroup.add(petalsGroup);
-
-            buildThreeLayerPetals(petalsGroup);
-            buildPurpleStippledHeart(petalsGroup);
-            buildSpiralStamens(petalsGroup);
-        }
-
-        function buildMidStemLeaves(parent, stemCurve) {
-            const leafShape = new THREE.Shape();
-            leafShape.moveTo(0, 0);
-            leafShape.bezierCurveTo(0.18, 0.2, 0.28, 0.5, 0, 0.95);
-            leafShape.bezierCurveTo(-0.28, 0.5, -0.18, 0.2, 0, 0);
-
-            const extrudeSettings = { depth: 0.01, bevelEnabled: true, bevelSegments: 2, bevelSize: 0.008, bevelThickness: 0.008 };
-            const leafGeo = new THREE.ExtrudeGeometry(leafShape, extrudeSettings);
-            const leafMat = new THREE.MeshStandardMaterial({ color: COLOR_PALETTE.leafDeepGreen, roughness: 0.45, metalness: 0.1, side: THREE.DoubleSide });
-
-            const midRatios = [0.42, 0.52, 0.62];
-            const angles = [0.2, 2.3, 4.4];
-
-            midRatios.forEach((t, index) => {
-                const point = stemCurve.getPoint(t);
-                const tangent = stemCurve.getTangent(t);
-                const leafPivot = new THREE.Group();
-                leafPivot.position.copy(point);
-
-                const axis = new THREE.Vector3(0, 1, 0);
-                leafPivot.quaternion.setFromUnitVectors(axis, tangent);
-
-                const leafMesh = new THREE.Mesh(leafGeo, leafMat);
-                leafMesh.rotation.y = angles[index];
-                leafMesh.rotation.x = 0.5 + Math.random() * 0.2;
-                leafMesh.scale.set(0.55, 0.6, 0.55);
-                leafPivot.add(leafMesh);
-                parent.add(leafPivot);
-            });
-        }
-
-        function buildBaseFoliage(parent) {
-            const baseLeavesGroup = new THREE.Group();
-            const leafShape = new THREE.Shape();
-            leafShape.moveTo(0, 0);
-            leafShape.bezierCurveTo(0.26, 0.3, 0.4, 0.75, 0, 1.4);
-            leafShape.bezierCurveTo(-0.4, 0.75, -0.26, 0.3, 0, 0);
-
-            const extrudeSettings = { depth: 0.015, bevelEnabled: true, bevelSegments: 3, bevelSize: 0.015, bevelThickness: 0.015 };
-            const leafGeo = new THREE.ExtrudeGeometry(leafShape, extrudeSettings);
-            const leafMat = new THREE.MeshStandardMaterial({ color: COLOR_PALETTE.leafDeepGreen, roughness: 0.4, metalness: 0.1, side: THREE.DoubleSide });
-
-            for (let i = 0; i < 10; i++) {
-                const angle = (i / 10) * Math.PI * 2;
-                const leaf = new THREE.Mesh(leafGeo, leafMat);
-                leaf.position.set(0, 0.02 + Math.random() * 0.06, 0);
-                leaf.rotation.y = angle + Math.random() * 0.2;
-                leaf.rotation.x = 0.85 + Math.random() * 0.15;
-                leaf.scale.set(0.42, 0.45, 0.42);
-                baseLeavesGroup.add(leaf);
-            }
-            parent.add(baseLeavesGroup);
-        }
-
-        function buildThreeLayerPetals(parent) {
-            // Top Layer
-            for (let i = 0; i < 5; i++) {
-                const angle = (i / 5) * Math.PI * 2;
-                const petalMesh = createExactLilyPetal('top');
-                const pivot = new THREE.Group();
-                pivot.rotation.y = angle;
-                petalMesh.rotation.x = 0.75;
-                pivot.add(petalMesh);
-                parent.add(pivot);
-            }
-            // Mid Layer
-            for (let i = 0; i < 3; i++) {
-                const angle = (i / 3) * Math.PI * 2 + (Math.PI / 5);
-                const petalMesh = createExactLilyPetal('mid');
-                const pivot = new THREE.Group();
-                pivot.rotation.y = angle;
-                petalMesh.rotation.x = 1.25;
-                petalMesh.position.set(0, -0.02, 0);
-                pivot.add(petalMesh);
-                parent.add(pivot);
-            }
-            // Bottom Layer
-            for (let i = 0; i < 5; i++) {
-                const angle = ((i + 0.5) / 5) * Math.PI * 2;
-                const petalMesh = createExactLilyPetal('bottom');
-                const pivot = new THREE.Group();
-                pivot.rotation.y = angle;
-                petalMesh.rotation.x = 1.65;
-                petalMesh.position.set(0, -0.04, 0);
-                pivot.add(petalMesh);
-                parent.add(pivot);
-            }
-        }
-
-        function createExactLilyPetal(layerType) {
-            const shape = new THREE.Shape();
-            shape.moveTo(0, 0);
-            shape.bezierCurveTo(0.24, 0.25, 0.42, 0.75, 0.32, 1.4);
-            shape.bezierCurveTo(0.22, 1.85, 0.08, 2.05, 0, 2.25);
-            shape.bezierCurveTo(-0.08, 2.05, -0.22, 1.85, -0.32, 1.4);
-            shape.bezierCurveTo(-0.42, 0.75, -0.24, 0.25, 0, 0);
-
-            const geometry = new THREE.ShapeGeometry(shape, 28);
-            const pos = geometry.attributes.position;
-            for (let i = 0; i < pos.count; i++) {
-                const y = pos.getY(i);
-                let z = Math.sin((y / 2.25) * Math.PI) * 0.38;
-                pos.setZ(i, z);
-            }
-            geometry.computeVertexNormals();
-
-            const petalMat = new THREE.MeshStandardMaterial({
-                color: COLOR_PALETTE.petalYellow,
-                emissive: COLOR_PALETTE.petalOrange,
-                emissiveIntensity: 0.9,
-                roughness: 0.2,
-                metalness: 0.08,
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.96
-            });
-
-            const petalMesh = new THREE.Mesh(geometry, petalMat);
-            let scale = layerType === 'bottom' ? 1.0 : (layerType === 'mid' ? 0.88 : 0.72);
-            petalMesh.scale.set(scale, scale, scale);
-            petalMesh.castShadow = true;
-            return petalMesh;
-        }
-
-        function buildPurpleStippledHeart(parent) {
-            const heartGroup = new THREE.Group();
-            const coreGeo = new THREE.SphereGeometry(0.26, 16, 16);
-            const coreMat = new THREE.MeshBasicMaterial({ color: COLOR_PALETTE.magentaHeart, transparent: true, opacity: 0.88 });
-            const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-            coreMesh.position.y = 0.08;
-            heartGroup.add(coreMesh);
-            parent.add(heartGroup);
-        }
-
-        function buildSpiralStamens(parent) {
-            stamensGroup = new THREE.Group();
-            const spiralPoints = [];
-            for (let i = 0; i <= 60; i++) {
-                const t = i / 60;
-                const angle = t * Math.PI * 3.8;
-                const radius = (1 - t * 0.7) * 0.09;
-                spiralPoints.push(new THREE.Vector3(Math.cos(angle) * radius - t * 0.12, t * 1.15, Math.sin(angle) * radius + t * 0.05));
-            }
-            const spiralCurve = new THREE.CatmullRomCurve3(spiralPoints);
-            const spiralGeo = new THREE.TubeGeometry(spiralCurve, 48, 0.014, 8, false);
-            const glowMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            stamensGroup.add(new THREE.Mesh(spiralGeo, glowMat));
-            parent.add(stamensGroup);
-        }
-
-        function buildMagicParticles() {
-            const particleCount = 240;
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            const vels = [];
-
-            for (let i = 0; i < particleCount; i++) {
-                positions[i * 3] = (Math.random() - 0.5) * 3.5;
-                positions[i * 3 + 1] = 0.3 + Math.random() * 4.4;
-                positions[i * 3 + 2] = (Math.random() - 0.5) * 3.5;
-                vels.push({ x: (Math.random() - 0.5) * 0.004, y: Math.random() * 0.007 + 0.002, z: (Math.random() - 0.5) * 0.004 });
-            }
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-            const canvas = document.createElement('canvas');
-            canvas.width = 32; canvas.height = 32;
-            const ctx = canvas.getContext('2d');
-            const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
-            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            grad.addColorStop(0.4, 'rgba(255, 210, 80, 0.85)');
-            grad.addColorStop(1, 'rgba(255, 120, 0, 0)');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 32, 32);
-
-            const material = new THREE.PointsMaterial({ size: 0.11, map: new THREE.CanvasTexture(canvas), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
-            particleSystem = new THREE.Points(geometry, material);
-            particleSystem.userData = { vels: vels };
-            scene.add(particleSystem);
-        }
-
-        function setupUI() {
-            document.getElementById('goldSlider').addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value);
-                goldLight.intensity = val;
-                document.getElementById('goldVal').textContent = val.toFixed(1);
-            });
-            document.getElementById('purpleSlider').addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value);
-                purpleLight.intensity = val;
-                document.getElementById('purpleVal').textContent = val.toFixed(1);
-            });
-            document.getElementById('partSlider').addEventListener('input', (e) => {
-                document.getElementById('partVal').textContent = parseFloat(e.target.value).toFixed(1);
-            });
-            document.getElementById('rotateBtn').addEventListener('click', () => {
-                autoRotate = !autoRotate;
-                document.getElementById('rotateBtn').classList.toggle('border-amber-400');
-            });
-            document.getElementById('resetCamBtn').addEventListener('click', () => {
-                camera.position.set(0, 1.8, 6.5);
-                controls.target.set(0, 1.4, 0);
-            });
-            document.getElementById('toggleControlsBtn').addEventListener('click', () => {
-                document.getElementById('controlsPanel').classList.toggle('hidden');
-            });
-        }
-
-        function onWindowResize() {
-            if (!camera || !renderer) return;
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const elapsedTime = clock.getElapsedTime();
-            const speed = parseFloat(document.getElementById('partSlider').value) || 1.0;
-
-            if (autoRotate && flowerGroup) {
-                flowerGroup.rotation.y += 0.005 * speed;
-            }
-            if (flowerGroup) {
-                petalsGroup.rotation.z = Math.sin(elapsedTime * 0.8) * 0.015;
-            }
-            if (goldLight) {
-                const baseInt = parseFloat(document.getElementById('goldSlider').value);
-                goldLight.intensity = baseInt + Math.sin(elapsedTime * 2.2) * 0.35;
-            }
-            if (particleSystem) {
-                const positions = particleSystem.geometry.attributes.position.array;
-                const vels = particleSystem.userData.vels;
-                for (let i = 0; i < vels.length; i++) {
-                    positions[i * 3] += vels[i].x * speed;
-                    positions[i * 3 + 1] += vels[i].y * speed;
-                    positions[i * 3 + 2] += vels[i].z * speed;
-                    if (positions[i * 3 + 1] > 4.8) {
-                        positions[i * 3] = (Math.random() - 0.5) * 3.5;
-                        positions[i * 3 + 1] = 0.3;
-                        positions[i * 3 + 2] = (Math.random() - 0.5) * 3.5;
-                    }
-                }
-                particleSystem.geometry.attributes.position.needsUpdate = true;
-            }
-            controls.update();
-            renderer.render(scene, camera);
-        }
-    </script>
 </body>
 </html>
