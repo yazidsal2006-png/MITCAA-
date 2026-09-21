@@ -1,227 +1,203 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Golden Flower Gift for Mitca</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: #050505;
-      color: #ffffff;
-      font-family: 'Georgia', serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      overflow-x: hidden;
-      padding: 20px 10px;
-    }
-
-    /* Contenedor de la lluvia de soles arriba */
-    .sun-rain-container {
-      width: 100%;
-      max-width: 400px;
-      height: 220px;
-      position: relative;
-      pointer-events: none;
-    }
-
-    .sun-particle {
-      position: absolute;
-      border-radius: 50%;
-      animation: floatSun ease-in-out infinite alternate;
-    }
-
-    @keyframes floatSun {
-      0% {
-        transform: translateY(0) scale(0.9);
-        opacity: 0.7;
-      }
-      100% {
-        transform: translateY(-12px) scale(1.1);
-        opacity: 1;
-      }
-    }
-
-    /* Contenedor principal de la flor */
-    .flower-container {
-      width: 100%;
-      max-width: 420px;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      margin-top: -30px;
-    }
-
-    .golden-flower-svg {
-      width: 100%;
-      height: auto;
-      overflow: visible;
-    }
-
-    /* Resplandor y animación mágica de la flor */
-    .magic-flower {
-      animation: magicGlow 3.5s ease-in-out infinite alternate;
-      transform-origin: 250px 220px;
-    }
-
-    @keyframes magicGlow {
-      0% {
-        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8)) 
-                drop-shadow(0 0 25px rgba(255, 183, 3, 0.5));
-      }
-      100% {
-        filter: drop-shadow(0 0 22px rgba(255, 240, 160, 1)) 
-                drop-shadow(0 0 45px rgba(251, 133, 0, 0.85))
-                drop-shadow(0 0 65px rgba(224, 170, 255, 0.4));
-      }
-    }
-
-    /* Texto inferior intacto */
-    .footer-text {
-      text-align: center;
-      font-style: italic;
-      font-size: 1.25rem;
-      line-height: 1.6;
-      color: #f0f0f0;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.6),
-                   0 0 20px rgba(255, 215, 0, 0.4);
-      margin-top: -60px;
-      margin-bottom: 20px;
-      z-index: 10;
-    }
-
-    .heart-icon {
-      display: inline-block;
-      color: #ffffff;
-      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
-      margin-left: 4px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flor Dorada Mágica - Enredados</title>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: radial-gradient(circle at center, #1a1a3a 0%, #050510 100%); 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        #info { 
+            position: absolute; 
+            top: 15px; 
+            left: 15px; 
+            z-index: 100; 
+            pointer-events: none; 
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        h2 { margin: 0 0 5px 0; color: #ffd700; font-size: 1.2rem; }
+        p { margin: 0; font-size: 0.9rem; color: #ccc; }
+    </style>
+    <!-- Librerías de Three.js para renderizado 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
+    <div id="info">
+        <h2>Flor Dorada Mágica</h2>
+        <p>Gira la cámara tocando y arrastrando. Haz zoom pellizcando la pantalla.</p>
+    </div>
 
-  <!-- Lluvia de soles (amarillo, blanco, morado) intacta -->
-  <div class="sun-rain-container" id="sunContainer"></div>
+    <script>
+        // 1. Configuración básica de la escena
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050510, 0.015);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 12, 25);
 
-  <!-- Flor Principal de Enredados de Alta Calidad -->
-  <div class="flower-container">
-    <svg viewBox="0 0 500 750" class="golden-flower-svg">
-      <defs>
-        <!-- Filtro de resplandor para los pétalos y centro -->
-        <radialGradient id="petalGrad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#FFFFFF" />
-          <stop offset="25%" stop-color="#FFF3a1" />
-          <stop offset="65%" stop-color="#FFB703" />
-          <stop offset="100%" stop-color="#FB8500" />
-        </radialGradient>
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-        <radialGradient id="centerGlow" cx="50%" cy="50%" r="40%">
-          <stop offset="0%" stop-color="#FFFFFF" />
-          <stop offset="45%" stop-color="#F72585" />
-          <stop offset="85%" stop-color="#7209B7" />
-          <stop offset="100%" stop-color="#3A0CA3" />
-        </radialGradient>
+        // Controles de cámara
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.target.set(0, 8, 0);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
 
-        <linearGradient id="stemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#0B2B18" />
-          <stop offset="50%" stop-color="#1B4332" />
-          <stop offset="100%" stop-color="#2D6A4F" />
-        </linearGradient>
-
-        <linearGradient id="leafGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#52B788" />
-          <stop offset="50%" stop-color="#2D6A4F" />
-          <stop offset="100%" stop-color="#081C15" />
-        </linearGradient>
-      </defs>
-
-      <!-- Base Vegetal Orgánica (Hojas Realistas) -->
-      <g class="leaf-base">
-        <path d="M 250 720 C 170 710, 90 650, 40 600 C 100 590, 190 640, 250 720 Z" fill="url(#leafGrad)" />
-        <path d="M 250 720 C 330 710, 410 650, 460 600 C 400 590, 310 640, 250 720 Z" fill="url(#leafGrad)" />
-        <path d="M 250 720 C 140 680, 70 560, 90 500 C 150 530, 210 620, 250 720 Z" fill="url(#leafGrad)" opacity="0.95" />
-        <path d="M 250 720 C 360 680, 430 560, 410 500 C 350 530, 290 620, 250 720 Z" fill="url(#leafGrad)" opacity="0.95" />
-        <path d="M 250 720 C 180 640, 140 520, 170 450 C 210 490, 230 580, 250 720 Z" fill="url(#leafGrad)" opacity="0.85" />
-        <path d="M 250 720 C 320 640, 360 520, 330 450 C 290 490, 270 580, 250 720 Z" fill="url(#leafGrad)" opacity="0.85" />
-      </g>
-
-      <!-- Tallo Curvado Orgánico con Grosor Realista -->
-      <path d="M 250 720 Q 230 520 255 380 T 250 220" fill="none" stroke="url(#stemGrad)" stroke-width="10" stroke-linecap="round" />
-
-      <!-- Hojas a lo largo del tallo -->
-      <path d="M 248 480 Q 180 450 160 410 Q 210 420 250 460 Z" fill="url(#leafGrad)" />
-      <path d="M 253 380 Q 320 350 340 310 Q 290 320 251 360 Z" fill="url(#leafGrad)" />
-
-      <!-- Flor Dorada Mágica de Enredados -->
-      <g class="magic-flower">
-        <!-- Pétalos Traseros -->
-        <path d="M 250 220 C 180 170, 110 160, 90 190 C 120 220, 190 230, 250 220 Z" fill="url(#petalGrad)" />
-        <path d="M 250 220 C 320 170, 390 160, 410 190 C 380 220, 310 230, 250 220 Z" fill="url(#petalGrad)" />
-        <path d="M 250 220 C 170 120, 180 40, 220 30 C 240 80, 245 150, 250 220 Z" fill="url(#petalGrad)" />
-        <path d="M 250 220 C 330 120, 320 40, 280 30 C 260 80, 255 150, 250 220 Z" fill="url(#petalGrad)" />
-
-        <!-- Pétalos Principales Estilo Azucena / Lirio Dorado -->
-        <path d="M 250 220 Q 140 160 120 90 Q 200 130 250 220 Z" fill="url(#petalGrad)" />
-        <path d="M 250 220 Q 360 160 380 90 Q 300 130 250 220 Z" fill="url(#petalGrad)" />
-        <path d="M 250 220 Q 250 80 250 50 Q 270 130 250 220 Z" fill="url(#petalGrad)" />
-
-        <!-- Centro Mágico Místico -->
-        <circle cx="250" cy="205" r="22" fill="url(#centerGlow)" />
-
-        <!-- Pistilos Curvos con Puntas Brillantes -->
-        <path d="M 250 205 Q 220 140 195 90 Q 205 85 215 95" fill="none" stroke="#FFF8D6" stroke-width="3" stroke-linecap="round" />
-        <path d="M 250 205 Q 280 140 305 90 Q 295 85 285 95" fill="none" stroke="#FFF8D6" stroke-width="3" stroke-linecap="round" />
-        <path d="M 250 205 Q 250 120 250 70" fill="none" stroke="#FFE45E" stroke-width="3.5" stroke-linecap="round" />
+        // 2. Iluminación mágica
+        const ambientLight = new THREE.AmbientLight(0x222244);
+        scene.add(ambientLight);
         
-        <circle cx="250" cy="65" r="6" fill="#FFFFFF" filter="drop-shadow(0 0 6px #FFF)" />
-        <circle cx="195" cy="85" r="5" fill="#FFFFFF" filter="drop-shadow(0 0 6px #FFF)" />
-        <circle cx="305" cy="85" r="5" fill="#FFFFFF" filter="drop-shadow(0 0 6px #FFF)" />
-      </g>
-    </svg>
-  </div>
+        // Resplandor Magenta del centro
+        const coreLight = new THREE.PointLight(0xff00ff, 2.5, 15);
+        coreLight.position.set(0, 10, 0);
+        scene.add(coreLight);
+        
+        // Luz Dorada de los pétalos
+        const goldLight = new THREE.PointLight(0xffaa00, 2, 30);
+        goldLight.position.set(0, 12, 0);
+        scene.add(goldLight);
 
-  <!-- Texto Inferior Dedicado Manteniendo el Formato -->
-  <div class="footer-text">
-    Con cariño de Yazid, ¿para quién más? Si solo para ti, Mitca. <span class="heart-icon">♥</span>
-  </div>
+        // 3. Materiales
+        const petalMat = new THREE.MeshStandardMaterial({ 
+            color: 0xffd700, 
+            emissive: 0xaa5500, 
+            emissiveIntensity: 0.4,
+            side: THREE.DoubleSide, 
+            roughness: 0.2, 
+            metalness: 0.1 
+        });
+        const leafMat = new THREE.MeshStandardMaterial({ 
+            color: 0x004411, 
+            side: THREE.DoubleSide,
+            roughness: 0.6
+        });
+        const stemMat = new THREE.MeshStandardMaterial({ color: 0x003311 });
 
-  <script>
-    // Generación dinámica de la lluvia de soles arriba (Amarillo, Blanco, Morado)
-    const container = document.getElementById('sunContainer');
-    const colors = ['#FFD700', '#FFFFFF', '#D8B4FE', '#FFEA79'];
-    const totalSuns = 22;
+        // 4. Creación de la geometría
+        const flowerGroup = new THREE.Group();
+        flowerGroup.position.y = 10; // Altura donde empieza la flor
 
-    for (let i = 0; i < totalSuns; i++) {
-      const sun = document.createElement('div');
-      sun.className = 'sun-particle';
-      
-      const size = Math.random() * 14 + 10;
-      const posX = Math.random() * 80 + 10;
-      const posY = Math.random() * 180 + 10;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const duration = Math.random() * 2 + 2;
-      const delay = Math.random() * 2;
+        // Función para crear formas de hojas y pétalos
+        function createPetal(length, width, bend) {
+            const shape = new THREE.Shape();
+            shape.moveTo(0, 0);
+            shape.quadraticCurveTo(width, length/3, 0, length);
+            shape.quadraticCurveTo(-width, length/3, 0, 0);
+            const geo = new THREE.ShapeGeometry(shape);
+            
+            const pos = geo.attributes.position;
+            for(let i=0; i<pos.count; i++) {
+                const y = pos.getY(i);
+                const z = Math.sin((y/length) * Math.PI) * bend;
+                pos.setZ(i, z);
+            }
+            geo.computeVertexNormals();
+            return new THREE.Mesh(geo, petalMat);
+        }
 
-      sun.style.width = `${size}px`;
-      sun.style.height = `${size}px`;
-      sun.style.left = `${posX}%`;
-      sun.style.top = `${posY}px`;
-      sun.style.backgroundColor = color;
-      sun.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
-      sun.style.animationDuration = `${duration}s`;
-      sun.style.animationDelay = `${delay}s`;
+        // A. Pétalos Superiores (Apuntando arriba, más pequeños)
+        for(let i=0; i<5; i++) {
+            const petal = createPetal(4.5, 1.5, 1.2);
+            petal.rotation.z = -Math.PI / 10;
+            petal.rotation.y = (i * Math.PI * 2) / 5;
+            petal.rotation.x = 0.4;
+            flowerGroup.add(petal);
+        }
 
-      container.appendChild(sun);
-    }
-  </script>
+        // B. Pétalos del Medio (Los 3 que pediste entre los de arriba y abajo)
+        for(let i=0; i<3; i++) {
+            const petal = createPetal(5.5, 2.0, 1.5);
+            petal.rotation.y = (i * Math.PI * 2) / 3 + 0.5; // Desfasados
+            petal.rotation.x = 0.9;
+            flowerGroup.add(petal);
+        }
+
+        // C. Pétalos Inferiores (Apuntando un poquito hacia arriba)
+        for(let i=0; i<5; i++) {
+            const petal = createPetal(7, 2.2, -0.5); 
+            petal.rotation.y = (i * Math.PI * 2) / 5 + 0.3;
+            petal.rotation.x = 1.3; 
+            flowerGroup.add(petal);
+        }
+
+        // D. Centro Púrpura (Corazón mágico)
+        const coreGeo = new THREE.SphereGeometry(0.8, 16, 16);
+        const coreMat = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        flowerGroup.add(core);
+
+        // INCLINACIÓN DE LA FLOR (Solo la flor se inclina)
+        flowerGroup.rotation.z = 0.35; 
+        scene.add(flowerGroup);
+
+        // 5. Tallo (Recto y en su lugar)
+        const stemGeo = new THREE.CylinderGeometry(0.2, 0.35, 10, 8);
+        const stem = new THREE.Mesh(stemGeo, stemMat);
+        stem.position.y = 5;
+        scene.add(stem);
+
+        // 6. Hojas de la base (Repartidas exactamente en los 4 puntos cardinales)
+        for(let i=0; i<4; i++) {
+            const leaf = createPetal(4.5, 1.5, 0.8);
+            leaf.material = leafMat;
+            leaf.rotation.x = 1.2; 
+            leaf.rotation.y = (i * Math.PI) / 2; // Norte, Este, Sur, Oeste exactos
+            leaf.position.y = 0;
+            scene.add(leaf);
+        }
+
+        // 7. Hojas a la mitad del tallo (Repartidas a distintas alturas)
+        for(let i=1; i<=3; i++) {
+            const leaf = createPetal(3, 1.2, 0.5);
+            leaf.material = leafMat;
+            leaf.rotation.x = 1.0;
+            leaf.rotation.y = i * 2.2; 
+            leaf.position.y = i * 2.5; 
+            scene.add(leaf);
+        }
+
+        // 8. Partículas mágicas (Polvo dorado)
+        const dustGeo = new THREE.BufferGeometry();
+        const dustCount = 200;
+        const dustPos = new Float32Array(dustCount * 3);
+        for(let i=0; i<dustCount*3; i++) {
+            dustPos[i] = (Math.random() - 0.5) * 20; 
+            if(i%3 === 1) dustPos[i] = Math.random() * 20; 
+        }
+        dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+        const dustMat = new THREE.PointsMaterial({ 
+            color: 0xffea00, 
+            size: 0.15, 
+            transparent: true, 
+            opacity: 0.8 
+        });
+        const dust = new THREE.Points(dustGeo, dustMat);
+        scene.add(dust);
+
+        // Animación constante
+        function animate() {
+            requestAnimationFrame(animate);
+            dust.rotation.y += 0.002; 
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
-
